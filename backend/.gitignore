@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+*.sqlite
+db.sqlite3
+media/
+staticfiles/
+.env
+.env.*
+
+# If using PostgreSQL/MySQL, exclude local config files
+*.psql
+*.mysql
+
+# Django migrations (optional — sometimes people keep them)
+**/migrations/*.pyc
+**/migrations/*.pyo
+**/migrations/__pycache__/
+# Uncomment to ignore migration files (optional)
+# **/migrations/*.py
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Linux
+*~ 
+*.swp
+*.swo
+
+# pipenv / poetry / virtualenv
+Pipfile.lock
+poetry.lock
+venv/
+env/
+ENV/
+.venv/
+.ENV/
