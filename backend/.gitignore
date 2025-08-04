@@ -26,10 +26,6 @@ staticfiles/
 *.mysql
 
 # Django migrations (optional — sometimes people keep them)
-**/migrations/*.pyc
-**/migrations/*.pyo
-**/migrations/__pycache__/
-blog/migrations/*.py
 # !blog/migrations/__init__.py
 # Uncomment to ignore migration files (optional)
 # **/migrations/*.py
