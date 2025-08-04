@@ -8,3 +8,5 @@ export const register = (userInfo) =>
 
 export const logout = () =>
   apiClient.post('/logout/').then(res => res.data);
+
+
