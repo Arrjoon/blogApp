@@ -4,23 +4,23 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { deletePost, fetchPosts } from '@/lib/api/apiPost';
+import { toast } from 'react-hot-toast';
 
 export default function PostListPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  function handleDelete(postId) {
-    if (confirm('Are you sure you want to delete this post?')) {
-      deletePost(postId)
-        .then(() => {
-          alert('Post deleted successfully!');
-          router.refresh(); // refresh list
-        })
-        .catch((err) => {
-          console.error('Failed to delete post:', err);
-          alert('Error deleting post.');
-        });
+  async function handleDelete(postId) {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      try {
+        await deletePost(postId);
+        toast.success('Post deleted successfully!');
+        setPosts(posts.filter(post => post.id !== postId));
+      } catch (err) {
+        console.error('Failed to delete post:', err);
+        toast.error('Error deleting post');
+      }
     }
   }
 
@@ -32,55 +32,114 @@ export default function PostListPage() {
       })
       .catch(error => {
         console.error('Error fetching posts:', error);
+        toast.error('Failed to load posts');
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <p className="text-center text-gray-600 mt-10">Loading posts...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse flex space-x-4">
+          <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+          <div className="flex-1 space-y-6 py-1">
+            <div className="h-2 bg-gray-200 rounded"></div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="h-2 bg-gray-200 rounded col-span-2"></div>
+                <div className="h-2 bg-gray-200 rounded col-span-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">All Posts</h1>
-        <Link
-          href="/posts/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-        >
-          + New Post
-        </Link>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Blog Posts</h1>
+          <Link
+            href="/posts/create"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+          >
+            Create New Post
+          </Link>
+        </div>
 
-      {posts.length === 0 ? (
-        <p className="text-gray-500">No posts found.</p>
-      ) : (
-        <ul className="space-y-6">
-          {posts.map(post => (
-            <li key={post.id} className="bg-white shadow-md rounded-lg p-6 border border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h2>
-              <div className="flex space-x-4 text-sm">
-                <Link
-                  href={`/posts/${post.id}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  View
-                </Link>
-                <Link
-                  href={`/posts/${post.id}/edit`}
-                  className="text-green-600 hover:underline"
-                >
-                  Edit
-                </Link>
-                <button
-                  onClick={() => handleDelete(post.id)}
-                  className="text-red-600 hover:underline"
-                >
-                  Delete
-                </button>
+        {posts.length === 0 ? (
+          <div className="text-center py-12">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h3 className="mt-2 text-lg font-medium text-gray-900">No posts</h3>
+            <p className="mt-1 text-sm text-gray-500">Get started by creating a new post.</p>
+            <div className="mt-6">
+              <Link
+                href="/posts/create"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Create Post
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {posts.map(post => (
+              <div key={post.id} className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
+                <div className="px-6 py-5">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold text-gray-900">{post.title}</h2>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      {post.category || 'General'}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-gray-600 line-clamp-2">
+                    {post.content || 'No content available'}
+                  </p>
+                </div>
+                <div className="bg-gray-50 px-6 py-4 flex justify-between items-center">
+                  <div className="text-sm text-gray-500">
+                    Posted on {new Date(post.created_at).toLocaleDateString()}
+                  </div>
+                  <div className="flex space-x-4">
+                    <Link
+                      href={`/posts/${post.id}`}
+                      className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                    >
+                      View
+                    </Link>
+                    <Link
+                      href={`/posts/${post.id}/edit`}
+                      className="text-sm font-medium text-green-600 hover:text-green-500"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(post.id)}
+                      className="text-sm font-medium text-red-600 hover:text-red-500"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               </div>
-            </li>
-          ))}
-        </ul>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
