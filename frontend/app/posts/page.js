@@ -5,8 +5,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { deletePost, fetchPosts } from '@/lib/api/apiPost';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '@/context/AuthContext'; // Make sure path is correct
 
 export default function PostListPage() {
+  const { token, user } = useAuth(); // ← Get auth state
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -14,7 +16,7 @@ export default function PostListPage() {
   async function handleDelete(postId) {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        await deletePost(postId);
+        await deletePost(postId); // Assumes token is handled in deletePost
         toast.success('Post deleted successfully!');
         setPosts(posts.filter(post => post.id !== postId));
       } catch (err) {
@@ -61,12 +63,21 @@ export default function PostListPage() {
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Blog Posts</h1>
-          <Link
-            href="/posts/create"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
-          >
-            Create New Post
-          </Link>
+          {token ? (
+            <Link
+              href="/posts/create"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+            >
+              Create New Post
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center px-4 py-2 border border-indigo-600 text-sm font-medium rounded-md shadow-sm text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+            >
+              Login
+            </Link>
+          )}
         </div>
 
         {posts.length === 0 ? (
@@ -86,14 +97,16 @@ export default function PostListPage() {
             </svg>
             <h3 className="mt-2 text-lg font-medium text-gray-900">No posts</h3>
             <p className="mt-1 text-sm text-gray-500">Get started by creating a new post.</p>
-            <div className="mt-6">
-              <Link
-                href="/posts/create"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Create Post
-              </Link>
-            </div>
+            {token && (
+              <div className="mt-6">
+                <Link
+                  href="/posts/create"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Create Post
+                </Link>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
@@ -121,18 +134,22 @@ export default function PostListPage() {
                     >
                       View
                     </Link>
-                    <Link
-                      href={`/posts/${post.id}/edit`}
-                      className="text-sm font-medium text-green-600 hover:text-green-500"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(post.id)}
-                      className="text-sm font-medium text-red-600 hover:text-red-500"
-                    >
-                      Delete
-                    </button>
+                    {token && (
+                      <>
+                        <Link
+                          href={`/posts/${post.id}/edit`}
+                          className="text-sm font-medium text-green-600 hover:text-green-500"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(post.id)}
+                          className="text-sm font-medium text-red-600 hover:text-red-500"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
