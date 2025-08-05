@@ -69,14 +69,9 @@ NEXT_PUBLIC_API_URL=http://localhost:8000/api
 ```
 blogApp/
 ├── backend/           # Django REST API
-│   ├── blog/         # Blog app
-│   ├── authentication/  # Auth app
-│   └── manage.py
+│  
 ├── frontend/         # Next.js app
-│   ├── pages/       # App pages
-│   ├── components/  # UI components
-│   └── package.json
-```
+
 
 ## Deployment
 - **Backend**: Deploy to Render with `gunicorn blogproject.wsgi:application`
