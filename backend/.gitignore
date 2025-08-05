@@ -29,8 +29,9 @@ staticfiles/
 # !blog/migrations/__init__.py
 # Uncomment to ignore migration files (optional)
 # **/migrations/*.py
-
 # VS Code
+
+
 .vscode/
 
 # PyCharm
@@ -43,6 +44,7 @@ staticfiles/
 *~ 
 *.swp
 *.swo
+
 
 # pipenv / poetry / virtualenv
 Pipfile.lock

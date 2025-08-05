@@ -32,8 +32,14 @@ def get_user_from_token(request):
     
     token = auth_header.split(' ')[1]
     payload = decode_jwt_token(token)
+
+    if payload == 'expired':
+        # You could log this or handle differently in views
+        print("Token has expired.")
+        return 'expired'
     
-    if not payload:
+    if payload == 'invalid' or not payload:
+        print("Token is invalid.")
         return None
     
     try:

@@ -126,6 +126,8 @@ class PostListView(View):
     def post(self, request):
         try:
             user = get_user_from_token(request)
+            if user == 'expired':
+                return error_response('Token has expired. Please login again.', 401)
             if not user:
                 return error_response('Authentication required', 401)
             

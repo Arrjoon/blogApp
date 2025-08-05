@@ -4,12 +4,22 @@ import LogoutButton from '@/components/LogoutButton';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 
-
 export default function Home() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  console.log('Home render - user:', user);
+  console.log('Home render - loading:', loading);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
- 
       <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to the Blog</h1>
       <p className="text-gray-600 mb-8 text-center max-w-md">
         Discover posts, read articles, and stay up to date with the latest content.
@@ -22,18 +32,16 @@ export default function Home() {
         View All Posts
       </Link>
 
-      
-
-       {user ? (
-          <LogoutButton />
-        ) : (
-          <Link
-            href="/auth/login"
-            className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100"
-          >
-            Login
-          </Link>
-        )}
+      {user ? (
+        <LogoutButton />
+      ) : (
+        <Link
+          href="/auth/login"
+          className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          Login
+        </Link>
+      )}
     </main>
   );
 }
